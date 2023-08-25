@@ -1,5 +1,26 @@
 from django.db import models
+# from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
+from django.db import models
+from django.utils.translation import gettext_lazy as _
+from .managers import CustomUserManager
 
+
+
+class CustomUser(AbstractUser):
+    username = None
+    email = models.EmailField(_("email address"), unique=True)
+    owner = models.BooleanField(default=False)
+    manager = models.BooleanField(default=False)
+    password = models.CharField(max_length=100)
+
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = []
+
+    objects = CustomUserManager()
+
+    def __str__(self):
+        return self.email
  
 
 
@@ -7,6 +28,8 @@ class Property(models.Model):
     name = models.CharField(max_length=100)
     address = models.CharField(max_length=200)
     description = models.TextField()
+    manager =  models.ManyToManyField(CustomUser, related_name='properties')
+    owner = models.ManyToManyField(CustomUser, related_name='propertieso')
 
     def __str__(self):
         return self.name
@@ -25,23 +48,3 @@ class PropertyUnit(models.Model):
         return f"{self.unit_number} - {self.property.name}"
 
 
-
-class PropertyOwner(models.Model):
-    name = models.CharField(max_length=100)
-    email = models.EmailField()
-    phone = models.CharField(max_length=15)
-    properties = models.ManyToManyField(Property, related_name='owners')
-    
-
-    def __str__(self):
-        return self.name
-
-class PropertyManager(models.Model):
-    name = models.CharField(max_length=100)
-    email = models.EmailField()
-    phone = models.CharField(max_length=15)
-    properties = models.ManyToManyField(Property, related_name='managers')
-    
-
-    def __str__(self):
-        return self.name
