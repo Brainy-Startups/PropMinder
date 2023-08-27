@@ -1,0 +1,11 @@
+
+*C:\Users\refoc\Desktop\PropMinder\env
+*.pyc
+*.pyo
+migrations/
+__pycache__
+*.pyc
+*.pyo
+*cpython-36.pyc
+
+*env

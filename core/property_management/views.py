@@ -3,14 +3,18 @@ from django.shortcuts import render, redirect
 from .models import *
 from django.contrib.auth import authenticate
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 
 # Create your views here.
 
-
+@login_required(login_url='login')
 def dashboard(request):
-    return render(request, 'base.html')
-    
+    if request.user.is_authenticated:
+        return render(request, 'base.html')
+    else:
+        return redirect('login')
+
 
 
 def register(request):
@@ -54,7 +58,13 @@ def login_user(request):
         if user is not None:
             print('user is not none')
             login(request)
+            print('logged in')
+            # redirect to dashboard page 
             return redirect('dashboard')
-        return HttpResponse('user is none')
-    return HttpResponse('not post request')
+        return redirect('login')
+    return redirect('login')
 
+
+def logout_user(request):
+    logout(request)
+    return redirect('login')
