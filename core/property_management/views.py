@@ -1,7 +1,10 @@
+from django.shortcuts import render
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login as auth_login, logout
+from .models import *
+from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from .models import CustomUser
+from django.http import HttpResponse
 
 # Create your views here.
 
@@ -22,15 +25,19 @@ def register_user(request):
     if request.method == 'POST':
         email = request.POST['email']
         password = request.POST['password']
-        owner = request.POST.get('owner') == 'on'
-        manager = request.POST.get('manager') == 'on'
+        owner = request.POST['owner']
+        manager = request.POST['manager']
 
-        user = CustomUser.objects.create_user(
-            email=email,
-            password=password,
-            owner=owner,
-            manager=manager,
-        )
+        if owner == 'on':
+            owner = True
+        else:
+            owner = False
+        if manager == 'on':
+            manager = True
+        else: 
+            manager = False
+        user = CustomUser.objects.create(email=email, password=password, owner=owner, manager=manager)
+        user.save()
         return redirect('login')
     else:
         return render(request, 'register.html')
@@ -50,7 +57,7 @@ def login_user(request):
         user = authenticate(email=email, password=password)
         if user is not None:
             print('user is not none')
-            auth_login(request, user)
+            login(request)
             print('logged in')
             # redirect to dashboard page 
             return redirect('dashboard')
