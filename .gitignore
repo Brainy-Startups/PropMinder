@@ -9,3 +9,5 @@ __pycache__
 *cpython-36.pyc
 
 *env
+.env
+db.sqlite3
